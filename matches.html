@@ -12,11 +12,6 @@
             shape: null,
             number: null,
             shade: null,
-            svg: {
-              onesquare: "",
-              twosquare: "",
-              threesquare: ""
-            },
             
             init: function(color, shape, number, shade) {
               this.color  = this.validateValue(color);
@@ -51,10 +46,14 @@
                 return this.getColor();
               }
             },
+            getId: function() {
+              return "" + this.color + this.shape + this.number + this.shade;
+            },
             draw: function(element) {
               _.templateSettings.variable = "card";
               var template = _.template($("script."+this.getShape()).html());
               var data = {
+                id: this.getId(),
                 fill: this.getShade(),
                 color: this.getColor(),
                 number: this.getNumber()
@@ -85,7 +84,7 @@
         for (var row=1;row<5;row++) {
           for (var col=1;col<4;col++) {
             var index = Math.floor(Math.random()*cards.length);
-            var card = cards.slice(index, index+1).pop();
+            var card = cards.splice(index, 1).pop();
             card.draw($("#" + row + col));
           }
         }
@@ -129,7 +128,7 @@
       </tr>
     </table>
     <script type="text/template" class="square">
-      <svg xmlns="http://www.w3.org/2000/svg" width="210px" height="135px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="210px" height="135px" id="<%- card.id %>">
       <pattern id="polkadot" patternUnits="userSpaceOnUse" width="9" height="9"><circle cx="5" cy="5" r="2" fill="<%- card.color %>"/></pattern>
       <% if (card.number == 3) { %>
         <rect x="20" y="20" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3" width="50" height="25"/>
@@ -149,7 +148,7 @@
       </svg>
     </script>
     <script type="text/template" class="circle">
-      <svg xmlns="http://www.w3.org/2000/svg" width="210px" height="135px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="210px" height="135px" id="<%- card.id %>">
       <pattern id="polkadot" patternUnits="userSpaceOnUse" width="9" height="9"><circle cx="5" cy="5" r="2" fill="<%- card.color %>"/></pattern>
       <% if (card.number == 3) { %>
         <ellipse cx="45" cy="32.5" rx="25" ry="12.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
