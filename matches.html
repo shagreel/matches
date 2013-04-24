@@ -1,0 +1,173 @@
+<html>
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
+    <script>
+      $(function(){
+        var Card = function(color, shape, number, shade) {
+          this.init(color, shape, number, shade);
+        }
+        Card.prototype = {
+            color: null,
+            shape: null,
+            number: null,
+            shade: null,
+            svg: {
+              onesquare: "",
+              twosquare: "",
+              threesquare: ""
+            },
+            
+            init: function(color, shape, number, shade) {
+              this.color  = this.validateValue(color);
+              this.shape  = this.validateValue(shape);
+              this.number = this.validateValue(number);
+              this.shade  = this.validateValue(shade);
+            },
+            validateValue: function(v) {
+              if (v == 0 || v == 1 || v == 2) {
+                return v;
+              }
+              throw "Invalid Value: " + v;
+            },
+            getColor: function() {
+              var colors = ["#ED1F24","#32CE06","#0611CE"];              
+              return colors[this.color];
+            },
+            getShape: function() {
+              var shapes = ["square", "circle", "square"];
+              return shapes[this.shape];
+            },
+            getNumber: function() {
+              return this.number + 1;
+            },
+            getShade: function() {
+              var shades = ["#FFFFFF", "url(#polkadot)", ]
+              if (this.shade == 0) {
+                return "#FFFFFF";
+              } else if (this.shade == 1) {
+                return "url(#polkadot)";
+              } else {
+                return this.getColor();
+              }
+            },
+            draw: function(element) {
+              _.templateSettings.variable = "card";
+              var template = _.template($("script."+this.getShape()).html());
+              var data = {
+                fill: this.getShade(),
+                color: this.getColor(),
+                number: this.getNumber()
+              };
+              element.html(template(data));
+            },
+            drawSquare: function() {
+              
+            },
+            drawCircle: function() {
+              
+            },
+        };
+        
+        // Create a set of cards containing every permutation of 
+        // color, shape, number, shade
+        var cards = new Array();
+        for (var color=0; color<3; color++) {
+          for (var shape=0; shape<3; shape++) {
+            for (var number=0; number<3; number++) {
+              for (var shade=0; shade<3; shade++) {
+                cards.push(new Card(color,shape,number,shade));
+              }
+            }
+          }
+        }
+        
+        for (var row=1;row<5;row++) {
+          for (var col=1;col<4;col++) {
+            var index = Math.floor(Math.random()*cards.length);
+            var card = cards.slice(index, index+1).pop();
+            card.draw($("#" + row + col));
+          }
+        }
+
+      });
+    </script>
+  </head>
+  <body>
+    <table>
+      <tr>
+        <td id="11">
+        </td>
+        <td id="12">
+        </td>
+        <td id="13">
+        </td>
+      </tr>
+      <tr>
+        <td id="21">
+        </td>
+        <td id="22">
+        </td>
+        <td id="23">
+        </td>
+      </tr>
+      <tr>
+        <td id="31">
+        </td>
+        <td id="32">
+        </td>
+        <td id="33">
+        </td>
+      </tr>
+      <tr>
+        <td id="41">
+        </td>
+        <td id="42">
+        </td>
+        <td id="43">
+        </td>
+      </tr>
+    </table>
+    <script type="text/template" class="square">
+      <svg xmlns="http://www.w3.org/2000/svg" width="210px" height="135px">
+      <pattern id="polkadot" patternUnits="userSpaceOnUse" width="9" height="9"><circle cx="5" cy="5" r="2" fill="<%- card.color %>"/></pattern>
+      <% if (card.number == 3) { %>
+        <rect x="20" y="20" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3" width="50" height="25"/>
+      <% } %>
+      <% if (card.number == 2) { %>
+        <rect x="50" y="37.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3" width="50" height="25"/>
+      <% } %>
+      <% if (card.number == 1 || card.number == 3) { %>
+        <rect x="80" y="55" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3" width="50" height="25"/>
+      <% } %>
+      <% if (card.number == 2) { %>
+        <rect x="110" y="72.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3" width="50" height="25"/>
+      <% } %>
+      <% if (card.number == 3) { %>
+        <rect x="140" y="90" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3" width="50" height="25"/>
+      <% } %>
+      </svg>
+    </script>
+    <script type="text/template" class="circle">
+      <svg xmlns="http://www.w3.org/2000/svg" width="210px" height="135px">
+      <pattern id="polkadot" patternUnits="userSpaceOnUse" width="9" height="9"><circle cx="5" cy="5" r="2" fill="<%- card.color %>"/></pattern>
+      <% if (card.number == 3) { %>
+        <ellipse cx="45" cy="32.5" rx="25" ry="12.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
+      <% } %>
+      <% if (card.number == 2) { %>
+        <ellipse cx="75" cy="50" rx="25" ry="12.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
+      <% } %>
+      <% if (card.number == 1 || card.number == 3) { %>
+        <ellipse cx="105" cy="67.5" rx="25" ry="12.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
+      <% } %>
+      <% if (card.number == 2) { %>
+        <ellipse cx="135" cy="85" rx="25" ry="12.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
+      <% } %>
+      <% if (card.number == 3) { %>
+        <ellipse cx="165" cy="102.5" rx="25" ry="12.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
+      <% } %>
+      </svg>
+    </script>
+    
+  </body>
+</html>
