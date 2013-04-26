@@ -72,18 +72,18 @@
                   svg.firstElementChild.style.fill = "#EDEDED"; // change the color back to the original color
                 }
                 if (selected.length == 3) {
-                  if (isValidSet(selected)) {
+                  if (isValidSet(selected[0], selected[1], selected[2])) {
                     alert('You found a match!!!');
-                      $(selected).each(function(index, id) {
-                        var svg = $('#'+id)[0];
-                        var parent = $(svg.parentNode);
-                        svg.remove();
-                        if (cards.length > 0) {
-                          var index = Math.floor(Math.random()*cards.length);
-                          var card = cards.splice(index, 1).pop();
-                          card.draw(parent);
-                        }
-                      });
+                    $(selected).each(function(index, id) {
+                      var svg = $('#'+id)[0];
+                      var parent = $(svg.parentNode);
+                      svg.remove();
+                      if (cards.length > 0) {
+                        var index = Math.floor(Math.random()*cards.length);
+                        var card = cards.splice(index, 1).pop();
+                        card.draw(parent);
+                      }
+                    });
                   } else {
                     alert('Invalid match!!!');
                     $(selected).each(function(index, id) {
@@ -103,16 +103,7 @@
         
         // Create a set of cards containing every permutation of 
         // color, shape, number, shade
-        var cards = new Array();
-        for (var color=0; color<3; color++) {
-          for (var shape=0; shape<3; shape++) {
-            for (var number=0; number<3; number++) {
-              for (var shade=0; shade<3; shade++) {
-                cards.push(new Card(color,shape,number,shade));
-              }
-            }
-          }
-        }
+        var cards = createDeck();
         
         // Draw each of the cards on the board
         for (var row=1;row<5;row++) {
@@ -123,26 +114,37 @@
           }
         }
         
-        
-        function isValidSet(selected) {
-          var first = selected[0];
-          var second = selected[1];
-          var third = selected[2];
+        function createDeck()
+        {
+          var cards = new Array();
+
+          /**
+           * TODO:
+           *
+           * Create a card object for every permutation of color, shape, number, and shade.
+           * Each attribute of the card is represented by a number 0, 1, or 2.
+           * You create a card like this: var card = new Card(0,0,0,0);
+           * After you create the card, push it on to the cards array.
+           *
+           */
           
-          return (allTheSame(first.charAt(0), second.charAt(0), third.charAt(0)) || allDifferent(first.charAt(0), second.charAt(0), third.charAt(0))) &&
-                  (allTheSame(first.charAt(1), second.charAt(1), third.charAt(1)) || allDifferent(first.charAt(1), second.charAt(1), third.charAt(1))) &&
-                  (allTheSame(first.charAt(2), second.charAt(2), third.charAt(2)) || allDifferent(first.charAt(2), second.charAt(2), third.charAt(2))) &&
-                  (allTheSame(first.charAt(3), second.charAt(3), third.charAt(3)) || allDifferent(first.charAt(3), second.charAt(3), third.charAt(3)));
-          
+          return cards;
         }
         
-        function allTheSame(first, second, third) {
-          return (first == second && first == third);
-        }
-        
-        function allDifferent(first, second, third) {
-          return (first != second && second != third && third != first);
-        }
+        function isValidSet(first, second, third) {
+          /**
+           * TODO:
+           *
+           * Fill out this method. Make it return true if the selected
+           * cards are a valid match, otherwise return false. 
+           * Each of the three values are 4 digit strings, ie. "0212"
+           * The each digit of the string represents a single attribute of the card.
+           * You need to compare the each digit of the three strings to make sure
+           * they are either all the same or all different.
+           *
+           */
+           
+         }
       });
     </script>
   </head>
