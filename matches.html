@@ -36,12 +36,11 @@
             getNumber: function() {
               return this.number + 1;
             },
-            getShade: function() {
-              var shades = ["#FFFFFF", "url(#polkadot)", ]
+            getShade: function(id) {
               if (this.shade == 0) {
                 return "#FFFFFF";
               } else if (this.shade == 1) {
-                return "url(#polkadot)";
+                return "url(#polkadot" + id + ")";
               } else {
                 return this.getColor();
               }
@@ -54,19 +53,53 @@
               var template = _.template($("script."+this.getShape()).html());
               var data = {
                 id: this.getId(),
-                fill: this.getShade(),
+                fill: this.getShade(this.getId()),
                 color: this.getColor(),
                 number: this.getNumber()
               };
-              element.html(template(data));
-            },
-            drawSquare: function() {
               
-            },
-            drawCircle: function() {
+              var td = $(element.html(template(data)));
+              var svg = $(td.find("svg")[0]);
+
+              svg.click(function(event) {
+                var svg = event.target.viewportElement;
+                var found = $.inArray(svg.id, selected);
+                if (found < 0) { // not selected yet
+                  selected.push(svg.id); // put it in the selected array
+                  svg.firstElementChild.style.fill = "#999999"; // change the color so the user know it was selected
+                } else { // already selected
+                  selected.splice(found, 1); // remove it from the selected array
+                  svg.firstElementChild.style.fill = "#EDEDED"; // change the color back to the original color
+                }
+                if (selected.length == 3) {
+                  if (isValidSet(selected)) {
+                    alert('You found a match!!!');
+                      $(selected).each(function(index, id) {
+                        var svg = $('#'+id)[0];
+                        var parent = $(svg.parentNode);
+                        svg.remove();
+                        if (cards.length > 0) {
+                          var index = Math.floor(Math.random()*cards.length);
+                          var card = cards.splice(index, 1).pop();
+                          card.draw(parent);
+                        }
+                      });
+                  } else {
+                    alert('Invalid match!!!');
+                    $(selected).each(function(index, id) {
+                      $('#'+id)[0].firstElementChild.style.fill = "#EDEDED";
+                    });
+                  }
+                  selected.splice(0,3);
+                }
+              });
               
-            },
+              return svg;
+            }
         };
+        
+        // Create a variable to represent the cards a user has selected
+        var selected = new Array();
         
         // Create a set of cards containing every permutation of 
         // color, shape, number, shade
@@ -81,6 +114,7 @@
           }
         }
         
+        // Draw each of the cards on the board
         for (var row=1;row<5;row++) {
           for (var col=1;col<4;col++) {
             var index = Math.floor(Math.random()*cards.length);
@@ -88,12 +122,32 @@
             card.draw($("#" + row + col));
           }
         }
-
+        
+        
+        function isValidSet(selected) {
+          var first = selected[0];
+          var second = selected[1];
+          var third = selected[2];
+          
+          return (allTheSame(first.charAt(0), second.charAt(0), third.charAt(0)) || allDifferent(first.charAt(0), second.charAt(0), third.charAt(0))) &&
+                  (allTheSame(first.charAt(1), second.charAt(1), third.charAt(1)) || allDifferent(first.charAt(1), second.charAt(1), third.charAt(1))) &&
+                  (allTheSame(first.charAt(2), second.charAt(2), third.charAt(2)) || allDifferent(first.charAt(2), second.charAt(2), third.charAt(2))) &&
+                  (allTheSame(first.charAt(3), second.charAt(3), third.charAt(3)) || allDifferent(first.charAt(3), second.charAt(3), third.charAt(3)));
+          
+        }
+        
+        function allTheSame(first, second, third) {
+          return (first == second && first == third);
+        }
+        
+        function allDifferent(first, second, third) {
+          return (first != second && second != third && third != first);
+        }
       });
     </script>
   </head>
   <body>
-    <table>
+    <table id="board">
       <tr>
         <td id="11">
         </td>
@@ -129,7 +183,11 @@
     </table>
     <script type="text/template" class="square">
       <svg xmlns="http://www.w3.org/2000/svg" width="210px" height="135px" id="<%- card.id %>">
-      <pattern id="polkadot" patternUnits="userSpaceOnUse" width="9" height="9"><circle cx="5" cy="5" r="2" fill="<%- card.color %>"/></pattern>
+      <rect x="3" y="3" width="204" height="129" rx="8" ry="8" fill="#EDEDED" stroke="#DEDEDE" stroke-width="1"/>
+      <pattern id="polkadot<%- card.id %>" patternUnits="userSpaceOnUse" x="0" y="0" width="9" height="9">
+        <rect x="0" y="0" width="9" height="9" fill="white"/>
+        <circle cx="5" cy="5" r="2" fill="<%- card.color %>"/>
+      </pattern>
       <% if (card.number == 3) { %>
         <rect x="20" y="20" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3" width="50" height="25"/>
       <% } %>
@@ -149,7 +207,11 @@
     </script>
     <script type="text/template" class="circle">
       <svg xmlns="http://www.w3.org/2000/svg" width="210px" height="135px" id="<%- card.id %>">
-      <pattern id="polkadot" patternUnits="userSpaceOnUse" width="9" height="9"><circle cx="5" cy="5" r="2" fill="<%- card.color %>"/></pattern>
+      <rect x="3" y="3" width="204" height="129" rx="8" ry="8" fill="#EDEDED" stroke="#DEDEDE" stroke-width="1"/>
+      <pattern id="polkadot<%- card.id %>" patternUnits="userSpaceOnUse" x="0" y="0" width="9" height="9">
+        <rect x="0" y="0" width="9" height="9" fill="white"/>
+        <circle cx="5" cy="5" r="2" fill="<%- card.color %>"/>
+      </pattern>
       <% if (card.number == 3) { %>
         <ellipse cx="45" cy="32.5" rx="25" ry="12.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
       <% } %>
@@ -169,21 +231,25 @@
     </script>
     <script type="text/template" class="diamond">
       <svg xmlns="http://www.w3.org/2000/svg" width="210px" height="135px" id="<%- card.id %>">
-      <pattern id="polkadot" patternUnits="userSpaceOnUse" width="9" height="9"><circle cx="5" cy="5" r="2" fill="<%- card.color %>"/></pattern>
+      <rect x="3" y="3" width="204" height="129" rx="8" ry="8" fill="#EDEDED" stroke="#DEDEDE" stroke-width="1"/>
+      <pattern id="polkadot<%- card.id %>" patternUnits="userSpaceOnUse" x="0" y="0" width="9" height="9">
+        <rect x="0" y="0" width="9" height="9" fill="white"/>
+        <circle cx="5" cy="5" r="2" fill="<%- card.color %>"/>
+      </pattern>
       <% if (card.number == 3) { %>
-        <polygon points="45,20    70,32.5   45,45    20,32.5"   fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
+        <polygon points="45,20 70,32.5 45,45 20,32.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
       <% } %>
       <% if (card.number == 2) { %>
-        <polygon points="75,37.5  100,50    75,62.5  50,50"     fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
+        <polygon points="75,37.5 100,50 75,62.5 50,50" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
       <% } %>
       <% if (card.number == 1 || card.number == 3) { %>
-        <polygon points="105,55   130,67.5  105,80   80,67.5"   fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
+        <polygon points="105,55 130,67.5 105,80 80,67.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
       <% } %>
       <% if (card.number == 2) { %>
-        <polygon points="135,72.5 160,85    135,97.5 110,85"    fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
+        <polygon points="135,72.5 160,85 135,97.5 110,85" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
       <% } %>
       <% if (card.number == 3) { %>
-        <polygon points="165,90   190,102.5 165,115  140,102.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
+        <polygon points="165,90 190,102.5 165,115 140,102.5" fill="<%- card.fill %>" stroke="<%- card.color %>" stroke-width="3"/>
       <% } %>
       </svg>
     </script>
