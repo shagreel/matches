@@ -127,6 +127,15 @@
            * After you create the card, push it on to the cards array.
            *
            */
+           for (var color=0; color<3; color++) {
+             for (var shape=0; shape<3; shape++) {
+               for (var number=0; number<3; number++) {
+                 for (var shade=0; shade<3; shade++) {
+                   cards.push(new Card(color,shape,number,shade));
+                 }
+               }
+             }
+           }
           
           return cards;
         }
@@ -143,8 +152,9 @@
            * they are either all the same or all different.
            *
            */
-           
-         }
+
+           }
+
       });
     </script>
   </head>
