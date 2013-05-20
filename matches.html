@@ -152,9 +152,20 @@
            * they are either all the same or all different.
            *
            */
+             return (allTheSame(first.charAt(0), second.charAt(0), third.charAt(0)) || allDifferent(first.charAt(0), second.charAt(0), third.charAt(0))) &&
+                     (allTheSame(first.charAt(1), second.charAt(1), third.charAt(1)) || allDifferent(first.charAt(1), second.charAt(1), third.charAt(1))) &&
+                     (allTheSame(first.charAt(2), second.charAt(2), third.charAt(2)) || allDifferent(first.charAt(2), second.charAt(2), third.charAt(2))) &&
+                     (allTheSame(first.charAt(3), second.charAt(3), third.charAt(3)) || allDifferent(first.charAt(3), second.charAt(3), third.charAt(3)));
 
            }
 
+           function allTheSame(first, second, third) {
+             return (first == second && first == third);
+           }
+
+           function allDifferent(first, second, third) {
+             return (first != second && second != third && third != first);
+           }
       });
     </script>
   </head>
